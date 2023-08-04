@@ -167,6 +167,39 @@ public class StringInputTests extends AbstractShellTests {
 	}
 
 	@Test
+	public void testResultMandatoryInput() throws InterruptedException {
+		ComponentContext<?> empty = ComponentContext.empty();
+		StringInput component1 = new StringInput(getTerminal());
+		component1.setResourceLoader(new DefaultResourceLoader());
+		component1.setTemplateExecutor(getTemplateExecutor());
+		component1.setMandatory(true);
+
+		service.execute(() -> {
+			StringInputContext run1Context = component1.run(empty);
+			result1.set(run1Context);
+			latch1.countDown();
+		});
+
+		TestBuffer testBuffer = new TestBuffer().cr();
+		write(testBuffer.getBytes());
+
+		latch1.await(2, TimeUnit.SECONDS);
+
+		StringInputContext run1Context = result1.get();
+		assertThat(consoleOut()).contains("This field is mandatory");
+		assertThat(run1Context).isNull();
+
+		testBuffer.append("test").cr();
+		write(testBuffer.getBytes());
+
+		latch1.await(2, TimeUnit.SECONDS);
+		run1Context = result1.get();
+
+		assertThat(run1Context).isNotNull();
+		assertThat(run1Context.getResultValue()).isEqualTo("test");
+	}
+
+	@Test
 	public void testPassingViaContext() throws InterruptedException {
 		ComponentContext<?> empty = ComponentContext.empty();
 		StringInput component1 = new StringInput(getTerminal(), "component1", "component1ResultValue");
