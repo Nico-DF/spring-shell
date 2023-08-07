@@ -72,6 +72,13 @@ public interface NumberInputSpec extends BaseInputSpec<NumberInputSpec> {
 	NumberInputSpec numberClass(Class<? extends Number> clazz);
 
 	/**
+	 * Sets input to required
+	 *
+	 * @return a builder
+	 */
+	NumberInputSpec required();
+
+	/**
 	 * Sets a renderer function.
 	 *
 	 * @param renderer the renderer

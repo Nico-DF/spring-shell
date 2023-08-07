@@ -37,6 +37,7 @@ public abstract class BaseNumberInput extends BaseInput<NumberInputSpec> impleme
 	private ResultMode resultMode;
 	private Number defaultValue;
 	private Class<? extends Number> clazz = Integer.class;
+	private boolean required = false;
 	private Function<NumberInputContext, List<AttributedString>> renderer;
 	private final List<Consumer<NumberInputContext>> preHandlers = new ArrayList<>();
 	private final List<Consumer<NumberInputContext>> postHandlers = new ArrayList<>();
@@ -75,6 +76,12 @@ public abstract class BaseNumberInput extends BaseInput<NumberInputSpec> impleme
 	@Override
 	public NumberInputSpec numberClass(Class<? extends Number> clazz) {
 		this.clazz = clazz;
+		return this;
+	}
+
+	@Override
+	public NumberInputSpec required() {
+		this.required = true;
 		return this;
 	}
 
@@ -143,6 +150,10 @@ public abstract class BaseNumberInput extends BaseInput<NumberInputSpec> impleme
 
 	public Class<? extends Number> getNumberClass() {
 		return clazz;
+	}
+
+	public boolean isRequired() {
+		return required;
 	}
 
 	public Function<NumberInputContext, List<AttributedString>> getRenderer() {

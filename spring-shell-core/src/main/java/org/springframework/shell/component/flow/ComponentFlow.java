@@ -515,7 +515,7 @@ public interface ComponentFlow {
 
 		private Stream<OrderedInputOperation> numberInputsStream() {
 			return numberInputs.stream().map(input -> {
-				NumberInput selector = new NumberInput(terminal, input.getName(), input.getDefaultValue(), input.getNumberClass());
+				NumberInput selector = new NumberInput(terminal, input.getName(), input.getDefaultValue(), input.getNumberClass(), input.isRequired());
 				UnaryOperator<ComponentContext<?>> operation = context -> {
 					if (input.getResultMode() == ResultMode.ACCEPT && input.isStoreResult()
 							&& input.getResultValue() != null) {
@@ -533,7 +533,10 @@ public interface ComponentFlow {
 					}
 					if (input.isStoreResult()) {
 						if (input.getResultMode() == ResultMode.VERIFY && input.getResultValue() != null) {
-							selector.addPreRunHandler(c -> c.setDefaultValue(input.getResultValue()));
+							selector.addPreRunHandler(c -> {
+								c.setDefaultValue(input.getResultValue());
+								c.setRequired(input.isRequired());
+							});
 						}
 						selector.addPostRunHandler(c -> c.put(input.getId(), c.getResultValue()));
 					}

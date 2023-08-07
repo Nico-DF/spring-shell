@@ -75,6 +75,16 @@ public class ComponentCommands extends AbstractShellComponent {
 		return "Got value " + context.getResultValue();
 	}
 
+	@ShellMethod(key = "component number required", value = "Number input", group = "Components")
+	public String numberInputRequired() {
+		NumberInput component = new NumberInput(getTerminal(), "Enter value");
+		component.setRequired(true);
+		component.setResourceLoader(getResourceLoader());
+		component.setTemplateExecutor(getTemplateExecutor());
+		NumberInputContext context = component.run(NumberInputContext.empty());
+		return "Got value " + context.getResultValue();
+	}
+
 	@ShellMethod(key = "component path", value = "Path input", group = "Components")
 	public String pathInput() {
 		PathInput component = new PathInput(getTerminal(), "Enter value");

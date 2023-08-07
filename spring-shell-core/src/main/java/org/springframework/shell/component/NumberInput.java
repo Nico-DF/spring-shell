@@ -44,6 +44,7 @@ public class NumberInput extends AbstractTextComponent<Number, NumberInputContex
 	private static final Logger log = LoggerFactory.getLogger(NumberInput.class);
 	private final Number defaultValue;
 	private Class<? extends Number> clazz;
+	private boolean required;
 	private NumberInputContext currentContext;
 
 	public NumberInput(Terminal terminal) {
@@ -55,24 +56,33 @@ public class NumberInput extends AbstractTextComponent<Number, NumberInputContex
 	}
 
 	public NumberInput(Terminal terminal, String name, Number defaultValue) {
-		this(terminal, name, defaultValue, Integer.class, null);
+		this(terminal, name, defaultValue, Integer.class);
 	}
 
 	public NumberInput(Terminal terminal, String name, Number defaultValue, Class<? extends Number> clazz) {
-		this(terminal, name, defaultValue, clazz, null);
+		this(terminal, name, defaultValue, clazz, false);
 	}
 
-	public NumberInput(Terminal terminal, String name, Number defaultValue, Class<? extends Number> clazz,
+	public NumberInput(Terminal terminal, String name, Number defaultValue, Class<? extends Number> clazz, boolean required) {
+		this(terminal, name, defaultValue, clazz, required, null);
+	}
+
+	public NumberInput(Terminal terminal, String name, Number defaultValue, Class<? extends Number> clazz, boolean required,
 			Function<NumberInputContext, List<AttributedString>> renderer) {
 		super(terminal, name, null);
 		setRenderer(renderer != null ? renderer : new DefaultRenderer());
 		setTemplateLocation("classpath:org/springframework/shell/component/number-input-default.stg");
 		this.defaultValue = defaultValue;
 		this.clazz = clazz;
+		this.required = required;
 	}
 
 	public void setNumberClass(Class<? extends Number>  clazz) {
 		this.clazz = clazz;
+	}
+
+	public void setRequired(boolean required) {
+		this.required = required;
 	}
 
 	@Override
@@ -80,7 +90,7 @@ public class NumberInput extends AbstractTextComponent<Number, NumberInputContex
 		if (context != null && currentContext == context) {
 			return currentContext;
 		}
-		currentContext = NumberInputContext.of(defaultValue, clazz);
+		currentContext = NumberInputContext.of(defaultValue, clazz, required);
 		currentContext.setName(getName());
 		Optional.ofNullable(context).map(ComponentContext::stream)
 				.ifPresent(entryStream -> entryStream.forEach(e -> currentContext.put(e.getKey(), e.getValue())));
@@ -121,6 +131,9 @@ public class NumberInput extends AbstractTextComponent<Number, NumberInputContex
 				}
 				else if (context.getDefaultValue() != null) {
 					context.setResultValue(context.getDefaultValue());
+				} else if (required) {
+					context.setMessage("This field is mandatory", TextComponentContext.MessageLevel.ERROR);
+					break;
 				}
 				return true;
 			default:
@@ -187,6 +200,20 @@ public class NumberInput extends AbstractTextComponent<Number, NumberInputContex
 		void setDefaultClass(Class<? extends Number> defaultClass);
 
 		/**
+		 * Sets flag for mandatory input.
+		 *
+		 * @param required true if input is required
+		 */
+		void setRequired(boolean required);
+
+		/**
+		 * Returns flag if input is required.
+		 *
+		 * @return true if input is required, false otherwise
+		 */
+		boolean isRequired();
+
+		/**
 		 * Gets an empty {@link NumberInputContext}.
 		 *
 		 * @return empty number input context
@@ -201,7 +228,7 @@ public class NumberInput extends AbstractTextComponent<Number, NumberInputContex
 		 * @return number input context
 		 */
 		public static NumberInputContext of(Number defaultValue) {
-			return new DefaultNumberInputContext(defaultValue, Integer.class);
+			return new DefaultNumberInputContext(defaultValue, Integer.class, false);
 		}
 
 		/**
@@ -210,7 +237,16 @@ public class NumberInput extends AbstractTextComponent<Number, NumberInputContex
 		 * @return number input context
 		 */
 		public static NumberInputContext of(Number defaultValue, Class<? extends Number> defaultClass) {
-			return new DefaultNumberInputContext(defaultValue, defaultClass);
+			return new DefaultNumberInputContext(defaultValue, defaultClass, false);
+		}
+
+		/**
+		 * Gets an {@link NumberInputContext}.
+		 *
+		 * @return number input context
+		 */
+		public static NumberInputContext of(Number defaultValue, Class<? extends Number> defaultClass, boolean required) {
+			return new DefaultNumberInputContext(defaultValue, defaultClass, required);
 		}
 	}
 
@@ -218,10 +254,12 @@ public class NumberInput extends AbstractTextComponent<Number, NumberInputContex
 
 		private Number defaultValue;
 		private Class<? extends Number> defaultClass;
+		private boolean required;
 
-		public DefaultNumberInputContext(Number defaultValue, Class<? extends Number> defaultClass) {
+		public DefaultNumberInputContext(Number defaultValue, Class<? extends Number> defaultClass, boolean required) {
 			this.defaultValue = defaultValue;
 			this.defaultClass = defaultClass;
+			this.required = required;
 		}
 
 		@Override
@@ -245,10 +283,21 @@ public class NumberInput extends AbstractTextComponent<Number, NumberInputContex
 		}
 
 		@Override
+		public void setRequired(boolean required) {
+			this.required = required;
+		}
+
+		@Override
+		public boolean isRequired() {
+			return required;
+		}
+
+		@Override
 		public Map<String, Object> toTemplateModel() {
 			Map<String, Object> attributes = super.toTemplateModel();
 			attributes.put("defaultValue", getDefaultValue() != null ? getDefaultValue() : null);
 			attributes.put("defaultClass", getDefaultClass().getSimpleName());
+			attributes.put("required", isRequired());
 			Map<String, Object> model = new HashMap<>();
 			model.put("model", attributes);
 			return model;

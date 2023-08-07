@@ -245,4 +245,37 @@ public class NumberInputTests extends AbstractShellTests {
 		assertThat(run1Context).isNotNull();
 		assertThat(run1Context.getResultValue()).isNull();
 	}
+
+	@Test
+	public void testResultMandatoryInput() throws InterruptedException {
+		ComponentContext<?> empty = ComponentContext.empty();
+		NumberInput component1 = new NumberInput(getTerminal());
+		component1.setResourceLoader(new DefaultResourceLoader());
+		component1.setTemplateExecutor(getTemplateExecutor());
+		component1.setRequired(true);
+
+		service.execute(() -> {
+			NumberInputContext run1Context = component1.run(empty);
+			result1.set(run1Context);
+			latch1.countDown();
+		});
+
+		TestBuffer testBuffer = new TestBuffer().cr();
+		write(testBuffer.getBytes());
+
+		latch1.await(2, TimeUnit.SECONDS);
+
+		NumberInputContext run1Context = result1.get();
+		assertThat(consoleOut()).contains("This field is mandatory");
+		assertThat(run1Context).isNull();
+
+		testBuffer.append("2").cr();
+		write(testBuffer.getBytes());
+
+		latch1.await(2, TimeUnit.SECONDS);
+		run1Context = result1.get();
+
+		assertThat(run1Context).isNotNull();
+		assertThat(run1Context.getResultValue()).isEqualTo(2);
+	}
 }

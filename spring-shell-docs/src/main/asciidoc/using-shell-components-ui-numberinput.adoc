@@ -28,6 +28,9 @@ The context object is `NumberInputContext`. The following table lists its contex
 |`defaultClass`
 |The default number class to use, if set. Otherwise, Integer.class.
 
+|`required`
+|`true` if the input is required. Otherwise, false.
+
 |`model`
 |The parent context variables (see <<textcomponentcontext-template-variables>>).
 |===

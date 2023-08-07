@@ -59,6 +59,10 @@ public class ComponentFlowTests extends AbstractShellTests {
 					.defaultValue(20.5)
 					.numberClass(Double.class)
 					.and()
+				.withNumberInput("number3")
+					.name("Number3")
+					.required()
+					.and()
 				.withPathInput("path1")
 					.name("Path1")
 					.and()
@@ -93,6 +97,9 @@ public class ComponentFlowTests extends AbstractShellTests {
 		// number2
 		testBuffer = new TestBuffer().cr();
 		write(testBuffer.getBytes());
+		// number3
+		testBuffer = new TestBuffer().cr().append("5").cr();
+		write(testBuffer.getBytes());
 		// path1
 		testBuffer = new TestBuffer().append("fakedir").cr();
 		write(testBuffer.getBytes());
@@ -110,6 +117,7 @@ public class ComponentFlowTests extends AbstractShellTests {
 		String field2 = inputWizardResult.getContext().get("field2");
 		Integer number1 = inputWizardResult.getContext().get("number1");
 		Double number2 = inputWizardResult.getContext().get("number2");
+		Integer number3 = inputWizardResult.getContext().get("number3");
 		Path path1 = inputWizardResult.getContext().get("path1");
 		String single1 = inputWizardResult.getContext().get("single1");
 		List<String> multi1 = inputWizardResult.getContext().get("multi1");
@@ -117,6 +125,7 @@ public class ComponentFlowTests extends AbstractShellTests {
 		assertThat(field2).isEqualTo("Field2Value");
 		assertThat(number1).isEqualTo(35);
 		assertThat(number2).isEqualTo(20.5);
+		assertThat(number3).isEqualTo(5);
 		assertThat(path1.toString()).contains("fakedir");
 		assertThat(single1).isEqualTo("value1");
 		assertThat(multi1).containsExactlyInAnyOrder("value2");
