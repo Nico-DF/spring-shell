@@ -15,6 +15,8 @@
  */
 package org.springframework.shell.component.flow;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,10 +29,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Test;
-
 import org.springframework.shell.component.flow.ComponentFlow.ComponentFlowResult;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class ComponentFlowTests extends AbstractShellTests {
 
@@ -54,7 +53,7 @@ public class ComponentFlowTests extends AbstractShellTests {
 					.and()
 				.withStringInput("field3")
 					.name("Field3")
-					.mandatory()
+					.required()
 					.and()
 				.withPathInput("path1")
 					.name("Path1")
