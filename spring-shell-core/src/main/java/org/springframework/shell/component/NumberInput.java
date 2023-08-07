@@ -126,10 +126,14 @@ public class NumberInput extends AbstractTextComponent<Number, NumberInputContex
 				checkInput(input, context);
 				break;
 			case OPERATION_EXIT:
-				if (StringUtils.hasText(context.getInput())) {
+				var num = parseNumber(context.getInput());
+
+				if (num != null) {
 					context.setResultValue(parseNumber(context.getInput()));
-				}
-				else if (context.getDefaultValue() != null) {
+				} else if (StringUtils.hasText(context.getInput())) {
+					printInvalidInput(context.getInput(), context);
+					break;
+				} else if (context.getDefaultValue() != null) {
 					context.setResultValue(context.getDefaultValue());
 				} else if (required) {
 					context.setMessage("This field is mandatory", TextComponentContext.MessageLevel.ERROR);
@@ -161,12 +165,16 @@ public class NumberInput extends AbstractTextComponent<Number, NumberInputContex
 		}
 		Number num =  parseNumber(input);
 		if (num == null) {
-			String msg = String.format("Sorry, your input is invalid: '%s', try again", input);
-			context.setMessage(msg, MessageLevel.ERROR);
+			printInvalidInput(input, context);
 		}
 		else {
 			context.setMessage(null);
 		}
+	}
+
+	private void printInvalidInput(String input, NumberInputContext context) {
+		String msg = String.format("Sorry, your input is invalid: '%s', try again", input);
+		context.setMessage(msg, MessageLevel.ERROR);
 	}
 
 	public interface NumberInputContext extends TextComponentContext<Number, NumberInputContext> {

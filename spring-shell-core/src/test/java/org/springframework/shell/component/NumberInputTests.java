@@ -238,12 +238,19 @@ public class NumberInputTests extends AbstractShellTests {
 
 		latch1.await(2, TimeUnit.SECONDS);
 
-		assertThat(consoleOut()).contains("input is invalid");
-
 		NumberInputContext run1Context = result1.get();
+		assertThat(consoleOut()).contains("input is invalid");
+		assertThat(run1Context).isNull();
 
+		// backspace 2 : cr + input
+		testBuffer.backspace(2).append("2").cr();
+		write(testBuffer.getBytes());
+
+		latch1.await(2, TimeUnit.SECONDS);
+
+		run1Context = result1.get();
 		assertThat(run1Context).isNotNull();
-		assertThat(run1Context.getResultValue()).isNull();
+		assertThat(run1Context.getResultValue()).isEqualTo(2);
 	}
 
 	@Test
