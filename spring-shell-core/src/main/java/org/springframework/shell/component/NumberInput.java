@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.shell.component.NumberInput.NumberInputContext;
 import org.springframework.shell.component.context.ComponentContext;
 import org.springframework.shell.component.support.AbstractTextComponent;
+import org.springframework.shell.component.support.AbstractTextComponent.TextComponentContext;
 import org.springframework.shell.component.support.AbstractTextComponent.TextComponentContext.MessageLevel;
 import org.springframework.util.NumberUtils;
 import org.springframework.util.StringUtils;
