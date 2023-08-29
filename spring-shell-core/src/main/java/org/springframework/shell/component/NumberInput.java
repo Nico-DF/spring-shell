@@ -127,7 +127,7 @@ public class NumberInput extends AbstractTextComponent<Number, NumberInputContex
 				checkInput(input, context);
 				break;
 			case OPERATION_EXIT:
-				var num = parseNumber(context.getInput());
+				Number num = parseNumber(context.getInput());
 
 				if (num != null) {
 					context.setResultValue(parseNumber(context.getInput()));
